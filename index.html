@@ -71,16 +71,16 @@
 
   <!-- Firebase SDKs -->
   <script type="module">
-    // Import the necessary Firebase functions
+    // Import the functions you need from the SDKs you need
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-    import { getDatabase, ref, push, set, onChildAdded } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+    import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
-    // Firebase configuration
+    // Your web app's Firebase configuration
     const firebaseConfig = {
       apiKey: "AIzaSyAQ-Af3PlYxDo5ggsC4TqPol-UiOUa-rVM",
       authDomain: "chatrom-c7094.firebaseapp.com",
       projectId: "chatrom-c7094",
-      storageBucket: "chatrom-c7094.appspot.com",
+      storageBucket: "chatrom-c7094.firebasestorage.app",
       messagingSenderId: "233306897624",
       appId: "1:233306897624:web:8b04343bf2f019952c2bad"
     };
@@ -127,13 +127,20 @@
     sendButton.addEventListener("click", () => {
       const message = messageInput.value;
       if (message && currentUser) {
-        const messagesRef = ref(db, 'messages/');
-        const newMessageRef = push(messagesRef); // Create a unique reference
-        set(newMessageRef, {
-          username: currentUser,
-          text: message,
-        });
-        messageInput.value = ''; // Clear the input
+        // Check if the message is '/clear'
+        if (message === "/clear") {
+          // Clear the chat
+          chatContainer.innerHTML = '';  // Clear all chat messages
+        } else {
+          // Otherwise, send the message to Firebase
+          const messagesRef = ref(db, 'messages/');
+          const newMessageRef = push(messagesRef);
+          newMessageRef.set({
+            username: currentUser,
+            text: message,
+          });
+        }
+        messageInput.value = ''; // Clear the input field after sending
       }
     });
 
