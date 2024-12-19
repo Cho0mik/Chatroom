@@ -1,15 +1,14 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+import { getDatabase, ref, push, onChildAdded, remove } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyAQ-Af3PlYxDo5ggsC4TqPol-UiOUa-rVM",
-  authDomain: "chatrom-c7094.firebaseapp.com",
-  projectId: "chatrom-c7094",
-  storageBucket: "chatrom-c7094.firebasestorage.app",
-  messagingSenderId: "233306897624",
-  appId: "1:233306897624:web:8b04343bf2f019952c2bad"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_STORAGE_BUCKET",
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+  appId: "YOUR_APP_ID"
 };
 
 // Initialize Firebase
@@ -54,19 +53,13 @@ logoutButton.addEventListener("click", () => {
 sendButton.addEventListener("click", () => {
   const message = messageInput.value;
   if (message && currentUser) {
-    if (message === "/clear") {
-      // Clear the chat view locally (only the user's screen)
-      chatContainer.innerHTML = '';  // This clears the chat window on the current user's screen
-    } else {
-      // Otherwise, send the message to Firebase
-      const messagesRef = ref(db, 'messages/');
-      const newMessageRef = push(messagesRef);
-      newMessageRef.set({
-        username: currentUser,
-        text: message,
-      }).catch(error => console.error("Error sending message: ", error)); // Handle any errors
-    }
-    messageInput.value = ''; // Clear the input field after sending
+    const messagesRef = ref(db, 'messages/');
+    const newMessageRef = push(messagesRef);
+    newMessageRef.set({
+      username: currentUser,
+      text: message,
+    });
+    messageInput.value = ''; // Clear the input
   }
 });
 
@@ -81,3 +74,21 @@ function displayMessages() {
     chatContainer.scrollTop = chatContainer.scrollHeight; // Scroll to the bottom
   });
 }
+
+// /clear command functionality
+function handleClearCommand(message) {
+  if (message === '/clear') {
+    const messagesRef = ref(db, 'messages/');
+    remove(messagesRef);  // Clear all messages from Firebase
+    chatContainer.innerHTML = '';  // Clear messages from the UI
+  }
+}
+
+// Listen for messages and clear command
+messageInput.addEventListener("input", () => {
+  const message = messageInput.value;
+  if (message.trim() === '/clear') {
+    handleClearCommand(message);
+  }
+});
+
