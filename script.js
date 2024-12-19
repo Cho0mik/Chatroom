@@ -53,13 +53,18 @@ logoutButton.addEventListener("click", () => {
 sendButton.addEventListener("click", () => {
   const message = messageInput.value;
   if (message && currentUser) {
-    const messagesRef = ref(db, 'messages/');
-    const newMessageRef = push(messagesRef);
-    newMessageRef.set({
-      username: currentUser,
-      text: message,
-    });
-    messageInput.value = ''; // Clear the input
+    if (message.trim() === '/clear') {
+      handleClearCommand(); // If /clear, handle it
+    } else {
+      // Send normal message to Firebase
+      const messagesRef = ref(db, 'messages/');
+      const newMessageRef = push(messagesRef);
+      newMessageRef.set({
+        username: currentUser,
+        text: message,
+      });
+      messageInput.value = ''; // Clear the input
+    }
   }
 });
 
@@ -76,19 +81,8 @@ function displayMessages() {
 }
 
 // /clear command functionality
-function handleClearCommand(message) {
-  if (message === '/clear') {
-    const messagesRef = ref(db, 'messages/');
-    remove(messagesRef);  // Clear all messages from Firebase
-    chatContainer.innerHTML = '';  // Clear messages from the UI
-  }
+function handleClearCommand() {
+  const messagesRef = ref(db, 'messages/');
+  remove(messagesRef);  // Clear all messages from Firebase
+  chatContainer.innerHTML = '';  // Clear messages from the UI
 }
-
-// Listen for messages and clear command
-messageInput.addEventListener("input", () => {
-  const message = messageInput.value;
-  if (message.trim() === '/clear') {
-    handleClearCommand(message);
-  }
-});
-
