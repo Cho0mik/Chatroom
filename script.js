@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getDatabase, ref, push, onChildAdded, remove } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
-// Your web app's Firebase configuration
+// Firebase configuration
 const firebaseConfig = {
   apiKey: "YOUR_API_KEY",
   authDomain: "YOUR_AUTH_DOMAIN",
@@ -49,21 +49,14 @@ logoutButton.addEventListener("click", () => {
   chatDiv.classList.add("hidden");
 });
 
-// Send message to Firebase
+// Send message functionality
 sendButton.addEventListener("click", () => {
-  const message = messageInput.value;
+  const message = messageInput.value.trim();
   if (message && currentUser) {
-    if (message.trim() === '/clear') {
-      handleClearCommand(); // If /clear, handle it
+    if (message === '/clear') {
+      handleClearCommand(); // Clear the chat if /clear is typed
     } else {
-      // Send normal message to Firebase
-      const messagesRef = ref(db, 'messages/');
-      const newMessageRef = push(messagesRef);
-      newMessageRef.set({
-        username: currentUser,
-        text: message,
-      });
-      messageInput.value = ''; // Clear the input
+      sendMessage(message); // Otherwise, send the normal message
     }
   }
 });
@@ -80,9 +73,21 @@ function displayMessages() {
   });
 }
 
-// /clear command functionality
+// Send a normal message to Firebase
+function sendMessage(message) {
+  const messagesRef = ref(db, 'messages/');
+  const newMessageRef = push(messagesRef);
+  newMessageRef.set({
+    username: currentUser,
+    text: message,
+  });
+  messageInput.value = ''; // Clear the input field
+}
+
+// Handle /clear command
 function handleClearCommand() {
   const messagesRef = ref(db, 'messages/');
-  remove(messagesRef);  // Clear all messages from Firebase
-  chatContainer.innerHTML = '';  // Clear messages from the UI
+  remove(messagesRef);  // Clear messages from Firebase
+  chatContainer.innerHTML = '';  // Clear chat in UI
 }
+
