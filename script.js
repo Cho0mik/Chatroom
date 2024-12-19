@@ -1,8 +1,4 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
-
-// Your web app's Firebase configuration
+// Firebase setup
 const firebaseConfig = {
   apiKey: "AIzaSyAQ-Af3PlYxDo5ggsC4TqPol-UiOUa-rVM",
   authDomain: "chatrom-c7094.firebaseapp.com",
@@ -13,8 +9,8 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+const app = firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
 // DOM Elements
 const loginDiv = document.getElementById("loginDiv");
@@ -54,26 +50,20 @@ logoutButton.addEventListener("click", () => {
 sendButton.addEventListener("click", () => {
   const message = messageInput.value;
   if (message && currentUser) {
-    if (message === "/clear") {
-      // Clear the chat view locally (only the user's screen)
-      chatContainer.innerHTML = '';  // This clears the chat window on the current user's screen
-    } else {
-      // Otherwise, send the message to Firebase
-      const messagesRef = ref(db, 'messages/');
-      const newMessageRef = push(messagesRef);
-      newMessageRef.set({
-        username: currentUser,
-        text: message,
-      });
-    }
-    messageInput.value = ''; // Clear the input field after sending
+    const messagesRef = db.ref('messages/');
+    const newMessageRef = messagesRef.push();
+    newMessageRef.set({
+      username: currentUser,
+      text: message
+    });
+    messageInput.value = ''; // Clear the input
   }
 });
 
 // Display messages from Firebase
 function displayMessages() {
-  const messagesRef = ref(db, 'messages/');
-  onChildAdded(messagesRef, (snapshot) => {
+  const messagesRef = db.ref('messages/');
+  messagesRef.on('child_added', (snapshot) => {
     const message = snapshot.val();
     const messageElement = document.createElement("div");
     messageElement.textContent = `${message.username}: ${message.text}`;
