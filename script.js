@@ -54,9 +54,9 @@ sendButton.addEventListener("click", () => {
   const message = messageInput.value.trim();
   if (message && currentUser) {
     if (message === '/clear') {
-      handleClearCommand(); // Clear the chat if /clear is typed
+      handleClearCommand(); // Clear chat if '/clear' is typed
     } else {
-      sendMessage(message); // Otherwise, send the normal message
+      sendMessage(message); // Send normal message
     }
   }
 });
@@ -84,10 +84,9 @@ function sendMessage(message) {
   messageInput.value = ''; // Clear the input field
 }
 
-// Handle /clear command
+// Handle '/clear' command
 function handleClearCommand() {
   const messagesRef = ref(db, 'messages/');
-  remove(messagesRef);  // Clear messages from Firebase
+  remove(messagesRef);  // Remove all messages from Firebase
   chatContainer.innerHTML = '';  // Clear chat in UI
 }
-
