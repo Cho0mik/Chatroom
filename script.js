@@ -1,5 +1,6 @@
+f
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getDatabase, ref, push, onChildAdded, remove } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -53,11 +54,7 @@ logoutButton.addEventListener("click", () => {
 sendButton.addEventListener("click", () => {
   const message = messageInput.value.trim();
   if (message && currentUser) {
-    if (message === '/clear') {
-      handleClearCommand(); // Clear chat if '/clear' is typed
-    } else {
-      sendMessage(message); // Send normal message
-    }
+    sendMessage(message); // Send normal message
   }
 });
 
@@ -82,11 +79,4 @@ function sendMessage(message) {
     text: message,
   });
   messageInput.value = ''; // Clear the input field
-}
-
-// Handle '/clear' command
-function handleClearCommand() {
-  const messagesRef = ref(db, 'messages/');
-  remove(messagesRef);  // Remove all messages from Firebase
-  chatContainer.innerHTML = '';  // Clear chat in UI
 }
