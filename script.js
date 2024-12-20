@@ -58,6 +58,7 @@ logoutButton.addEventListener("click", () => {
   currentUser = "";
   loginDiv.classList.remove("hidden");
   chatDiv.classList.add("hidden");
+  chatContainer.innerHTML = ""; // Clear messages
 });
 
 // Send message to Firebase
