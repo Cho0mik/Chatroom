@@ -1,9 +1,11 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chat Room for Friends</title>
+  <title>ChoomikLiveMessenger</title>
   <style>
     body {
       background-image: url('https://static.wikia.nocookie.net/048dc2b7-ee21-4f42-97ab-e457d2b6727d'); /* Replace with the URL of your background image */
@@ -50,25 +52,21 @@
     button:hover {
       background-color: #0056b3;
     }
-    .message {
-      display: flex;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-    .message img {
-      width: 40px;
-      height: 40px;
+    .profile-pic {
+      width: 30px;
+      height: 30px;
       border-radius: 50%;
       margin-right: 10px;
+      vertical-align: middle;
     }
   </style>
 </head>
 <body>
-  <h1 id="header">we.chat_Perdoname_Carlos</h1>
+  <h1 id="header">Chatroom</h1>
 
   <!-- Login Form -->
   <div id="loginDiv">
-    <input type="text" id="loginToken" placeholder="Enter Token">
+    <input type="text" id="loginToken" placeholder="Insert_Token">
     <button id="loginButton">Login</button>
   </div>
 
@@ -80,7 +78,8 @@
     <button id="logoutButton">Logout</button>
   </div>
 
-  <!-- JavaScript -->
-  <script src="script.js" type="module"></script>
+  <!-- Firebase SDKs -->
+  <script type="module" src="chat.js"></script>
 </body>
 </html>
+
