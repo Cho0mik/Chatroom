@@ -11,7 +11,7 @@
       background-repeat: no-repeat;
       background-attachment: fixed;
       font-family: Arial, sans-serif;
-      color: #000;
+      color: #000000;
     }
     #header {
       text-align: center;
@@ -54,22 +54,16 @@
 </head>
 <body>
   <h1 id="header">we.chat_Perdoname_Carlos</h1>
-
-  <!-- Login Form -->
   <div id="loginDiv">
     <input type="text" id="loginToken" placeholder="Enter Token">
     <button id="loginButton">Login</button>
   </div>
-
-  <!-- Chat Room -->
   <div id="chatDiv" class="hidden">
     <div id="chat"></div>
     <input type="text" id="messageInput" placeholder="Type a message...">
     <button id="sendButton">Send</button>
     <button id="logoutButton">Logout</button>
   </div>
-
-  <!-- Firebase SDKs -->
-  <script type="module" src="script.js"></script>
+  <script src="script.js" type="module"></script>
 </body>
 </html>
