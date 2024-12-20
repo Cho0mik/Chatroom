@@ -1,5 +1,3 @@
-
-
 // Import the necessary Firebase functions
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getDatabase, ref, push, set, onChildAdded } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
@@ -92,4 +90,3 @@ function displayMessages() {
     chatContainer.scrollTop = chatContainer.scrollHeight; // Scroll to the bottom
   });
 }
-
