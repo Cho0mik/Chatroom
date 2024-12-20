@@ -28,10 +28,10 @@ const chatContainer = document.getElementById("chat");
 
 // Tokens for login and profile pictures
 const users = {
-  "Cheems": "https://preview.redd.it/msn-avatars-of-all-colors-v0-i19z4jwd5uha1.png?width=1024&format=png&auto=webp&s=3c7433ca602ffbf815e65c46a889bafb85134534",
-  "Ax3l": "https://preview.redd.it/msn-avatars-of-all-colors-v0-wpe4viwd5uha1.png?width=1024&format=png&auto=webp&s=56ab2a2b048c8841b6ba83b76f756b695d7a1eec",
-  "Carros": "https://preview.redd.it/msn-avatars-of-all-colors-v0-4k4l1oxd5uha1.png?width=1024&format=png&auto=webp&s=9363652eb05af6dcbfa606e30923fed24af1b65d",
-  "Lui": "https://preview.redd.it/msn-avatars-of-all-colors-v0-kdmrknxd5uha1.png?width=1024&format=png&auto=webp&s=7706fc01bdb28170610d79fa7104e3ecf8b40866"
+  "Cheems": "https://i.redd.it/i19z4jwd5uha1.png",
+  "Ax3l": "https://i.redd.it/wpe4viwd5uha1.png",
+  "Carros": "https://i.redd.it/4k4l1oxd5uha1.png",
+  "Lui": "https://i.redd.it/kdmrknxd5uha1.png"
 };
 
 let currentUser = "";
@@ -90,5 +90,8 @@ function displayMessages() {
     messageElement.appendChild(textElement);
     chatContainer.appendChild(messageElement);
     chatContainer.scrollTop = chatContainer.scrollHeight; // Scroll to the bottom
+
+    // Debugging log to check if images are being loaded correctly
+    console.log("Profile picture URL: ", message.pfp);
   });
 }
