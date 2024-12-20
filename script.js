@@ -1,6 +1,7 @@
 // Import the necessary Firebase functions
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getDatabase, ref, push, set, onChildAdded } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -15,6 +16,7 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+const auth = getAuth(app);
 
 // DOM Elements
 const loginDiv = document.getElementById("loginDiv");
@@ -43,11 +45,18 @@ let profilePicUrl = "";
 loginButton.addEventListener("click", () => {
   const token = loginTokenInput.value;
   if (validTokens.includes(token)) {
-    currentUser = token;
-    profilePicUrl = defaultProfilePics[token];
-    loginDiv.classList.add("hidden");
-    chatDiv.classList.remove("hidden");
-    displayMessages();
+    // Simulate Firebase login (anonymous in this case)
+    signInAnonymously(auth)
+      .then(() => {
+        currentUser = token;
+        profilePicUrl = defaultProfilePics[token];
+        loginDiv.classList.add("hidden");
+        chatDiv.classList.remove("hidden");
+        displayMessages();
+      })
+      .catch((error) => {
+        alert("Error: " + error.message);
+      });
   } else {
     alert("Invalid Token");
   }
