@@ -20,13 +20,17 @@ const auth = getAuth(app);
 
 // DOM Elements
 const loginDiv = document.getElementById("loginDiv");
+const channelDiv = document.getElementById("channelDiv");
 const chatDiv = document.getElementById("chatDiv");
 const loginTokenInput = document.getElementById("loginToken");
 const loginButton = document.getElementById("loginButton");
 const sendButton = document.getElementById("sendButton");
 const messageInput = document.getElementById("messageInput");
 const logoutButton = document.getElementById("logoutButton");
+const backButton = document.getElementById("backButton");
 const chatContainer = document.getElementById("chat");
+
+const channelButtons = document.querySelectorAll(".channelButton");
 
 // Default profile pictures
 const defaultProfilePics = {
@@ -40,6 +44,7 @@ const defaultProfilePics = {
 const validTokens = ["Cheems", "Ax3l", "Carros", "Lui"];
 let currentUser = "";
 let profilePicUrl = "";
+let currentChannel = "";
 
 // Login functionality
 loginButton.addEventListener("click", () => {
@@ -51,8 +56,7 @@ loginButton.addEventListener("click", () => {
         currentUser = token;
         profilePicUrl = defaultProfilePics[token];
         loginDiv.classList.add("hidden");
-        chatDiv.classList.remove("hidden");
-        displayMessages();
+        channelDiv.classList.remove("hidden");
       })
       .catch((error) => {
         alert("Error: " + error.message);
@@ -65,16 +69,36 @@ loginButton.addEventListener("click", () => {
 // Logout functionality
 logoutButton.addEventListener("click", () => {
   currentUser = "";
+  currentChannel = "";
   loginDiv.classList.remove("hidden");
+  channelDiv.classList.add("hidden");
   chatDiv.classList.add("hidden");
+  chatContainer.innerHTML = ""; // Clear messages
+});
+
+// Channel selection functionality
+channelButtons.forEach(button => {
+  button.addEventListener("click", () => {
+    currentChannel = button.getAttribute("data-channel");
+    channelDiv.classList.add("hidden");
+    chatDiv.classList.remove("hidden");
+    chatContainer.innerHTML = ""; // Clear messages
+    displayMessages();
+  });
+});
+
+// Back to channel selection
+backButton.addEventListener("click", () => {
+  chatDiv.classList.add("hidden");
+  channelDiv.classList.remove("hidden");
   chatContainer.innerHTML = ""; // Clear messages
 });
 
 // Send message to Firebase
 sendButton.addEventListener("click", () => {
   const message = messageInput.value;
-  if (message && currentUser) {
-    const messagesRef = ref(db, 'messages/');
+  if (message && currentUser && currentChannel) {
+    const messagesRef = ref(db, `channels/${currentChannel}/messages/`);
     const newMessageRef = push(messagesRef);
     set(newMessageRef, {
       username: currentUser,
@@ -87,7 +111,8 @@ sendButton.addEventListener("click", () => {
 
 // Display messages from Firebase
 function displayMessages() {
-  const messagesRef = ref(db, 'messages/');
+  if (!currentChannel) return;
+  const messagesRef = ref(db, `channels/${currentChannel}/messages/`);
   onChildAdded(messagesRef, (snapshot) => {
     const message = snapshot.val();
     const messageElement = document.createElement("div");
