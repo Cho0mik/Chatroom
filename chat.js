@@ -30,6 +30,7 @@ const imageInput = document.getElementById("imageInput");
 const logoutButton = document.getElementById("logoutButton");
 const backButton = document.getElementById("backButton");
 const chatContainer = document.getElementById("chat");
+const notificationContainer = document.getElementById("notificationContainer"); // Container for notifications
 
 const channelButtons = document.querySelectorAll(".channelButton");
 
@@ -57,6 +58,7 @@ loginButton.addEventListener("click", () => {
         profilePicUrl = defaultProfilePics[token];
         loginDiv.classList.add("hidden");
         channelDiv.classList.remove("hidden");
+        showNotification(`${currentUser} logged in successfully!`, 'success');
       })
       .catch((error) => {
         alert("Error: " + error.message);
@@ -74,6 +76,7 @@ logoutButton.addEventListener("click", () => {
   channelDiv.classList.add("hidden");
   chatDiv.classList.add("hidden");
   chatContainer.innerHTML = ""; // Clear messages
+  showNotification(`Logged out successfully.`, 'info');
 });
 
 // Channel selection functionality
@@ -84,6 +87,7 @@ channelButtons.forEach(button => {
     chatDiv.classList.remove("hidden");
     chatContainer.innerHTML = ""; // Clear messages
     displayMessages();
+    showNotification(`Joined ${currentChannel} channel.`, 'success');
   });
 });
 
@@ -114,6 +118,7 @@ sendButton.addEventListener("click", () => {
     
     messageInput.value = ''; // Clear the input
     imageInput.value = '';  // Clear image URL input
+    showNotification(`Message sent to ${currentChannel}`, 'info');
   }
 });
 
@@ -150,4 +155,16 @@ function displayMessages() {
     chatContainer.appendChild(messageElement);
     chatContainer.scrollTop = chatContainer.scrollHeight; // Scroll to the bottom
   });
+}
+
+// Show notification
+function showNotification(message, type) {
+  const notification = document.createElement("div");
+  notification.classList.add("notification", type);
+  notification.textContent = message;
+  notificationContainer.appendChild(notification);
+
+  setTimeout(() => {
+    notification.remove();
+  }, 1000);
 }
