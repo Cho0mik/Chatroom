@@ -113,7 +113,18 @@ backButton.addEventListener("click", () => {
 });
 
 // Send message (Text + Image)
-sendButton.addEventListener("click", () => {
+sendButton.addEventListener("click", sendMessage);
+
+// Bind "Enter" key to send message
+messageInput.addEventListener("keypress", (event) => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    sendMessage();
+  }
+});
+
+// Function to send message
+function sendMessage() {
   const text = messageInput.value;
   const imageUrl = imageInput.value;
   const uniqueId = Math.random().toString(36).substr(2, 9);  // Random unique ID for each message
@@ -136,7 +147,7 @@ sendButton.addEventListener("click", () => {
     imageInput.value = '';  // Clear image URL input
     showNotification(`Message sent to ${currentChannel}`, 'info');
   }
-});
+}
 
 // Display messages from Firebase
 function displayMessages() {
