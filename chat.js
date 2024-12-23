@@ -1,6 +1,6 @@
-// Import the necessary Firebase functions
+// Firebase configuration and imports
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getDatabase, ref, push, set, onChildAdded, off } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+import { getDatabase, ref, push, set, onChildAdded, get } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
 // Firebase configuration
@@ -48,18 +48,8 @@ let currentUser = "";
 let profilePicUrl = "";
 let currentChannel = "";
 
-// Request permission for notifications
-function requestNotificationPermission() {
-  if (Notification.permission === "default") {
-    Notification.requestPermission().then(permission => {
-      if (permission === "granted") {
-        console.log("Notification permission granted.");
-      } else {
-        console.log("Notification permission denied.");
-      }
-    });
-  }
-}
+// Track the timestamp of the last message processed
+let lastMessageTimestamp = 0;
 
 // Login functionality
 loginButton.addEventListener("click", () => {
@@ -72,7 +62,6 @@ loginButton.addEventListener("click", () => {
         loginDiv.classList.add("hidden");
         channelDiv.classList.remove("hidden");
         showNotification(`${currentUser} logged in successfully!`, 'success');
-        requestNotificationPermission(); // Request permission for notifications
       })
       .catch((error) => {
         alert("Error: " + error.message);
@@ -99,8 +88,8 @@ channelButtons.forEach(button => {
     currentChannel = button.getAttribute("data-channel");
     channelDiv.classList.add("hidden");
     chatDiv.classList.remove("hidden");
-    chatContainer.innerHTML = ""; // Clear messages before displaying new ones
-    displayMessages();
+    chatContainer.innerHTML = ""; // Clear messages
+    displayMessages();  // Load messages from the selected channel
     showNotification(`Joined ${currentChannel} channel.`, 'success');
   });
 });
@@ -109,7 +98,7 @@ channelButtons.forEach(button => {
 backButton.addEventListener("click", () => {
   chatDiv.classList.add("hidden");
   channelDiv.classList.remove("hidden");
-  chatContainer.innerHTML = ""; // Clear messages before going back
+  chatContainer.innerHTML = ""; // Clear messages
 });
 
 // Send message (Text + Image)
@@ -117,6 +106,7 @@ sendButton.addEventListener("click", () => {
   const text = messageInput.value;
   const imageUrl = imageInput.value;
   const uniqueId = Math.random().toString(36).substr(2, 9);  // Random unique ID for each message
+  const timestamp = Date.now();  // Current timestamp in milliseconds
   
   if (text || imageUrl) {
     const messagesRef = ref(db, `channels/${currentChannel}/messages/`);
@@ -127,7 +117,8 @@ sendButton.addEventListener("click", () => {
       username: currentUser,
       text: text || null,
       imageUrl: imageUrl || null,
-      profilePic: profilePicUrl
+      profilePic: profilePicUrl,
+      timestamp: timestamp // Add timestamp to each message
     });
     
     messageInput.value = ''; // Clear the input
@@ -141,50 +132,62 @@ function displayMessages() {
   if (!currentChannel) return;
 
   const messagesRef = ref(db, `channels/${currentChannel}/messages/`);
-  
-  // Remove previous event listener to avoid duplicates
-  off(messagesRef); 
 
+  // Fetch the messages and only trigger the rendering once for existing ones
+  get(messagesRef).then((snapshot) => {
+    const messages = snapshot.val();
+    if (messages) {
+      Object.keys(messages).forEach(messageId => {
+        const message = messages[messageId];
+        displayMessage(message);
+      });
+    }
+  });
+
+  // Now listen for new messages
   onChildAdded(messagesRef, (snapshot) => {
     const message = snapshot.val();
-    const messageElement = document.createElement("div");
-    messageElement.classList.add("message-container");
 
-    const profilePicElement = document.createElement("img");
-    profilePicElement.src = message.profilePic;
-    profilePicElement.className = "profile-pic";
-    messageElement.appendChild(profilePicElement);
-    
-    // Display image if available
-    if (message.imageUrl) {
-      const imageElement = document.createElement("img");
-      imageElement.src = message.imageUrl;
-      imageElement.style.maxWidth = "300px";
-      messageElement.appendChild(imageElement);
-    }
-
-    // Display text message
-    if (message.text) {
-      const messageText = document.createElement("div");
-      messageText.classList.add("message-content");
-      messageText.textContent = `${message.username}: ${message.text}`;
-      messageElement.appendChild(messageText);
-    }
-
-    chatContainer.appendChild(messageElement);
-    chatContainer.scrollTop = chatContainer.scrollHeight; // Scroll to the bottom
-
-    // Show a system notification for the new message
-    if (Notification.permission === "granted") {
-      new Notification(`New message from ${message.username}`, {
-        body: message.text || "Message contains an image.",
-        icon: message.profilePic
-      });
+    // If the message timestamp is newer than the last processed timestamp, display it
+    if (message.timestamp > lastMessageTimestamp) {
+      displayMessage(message);
+      showNotification(`${message.username} sent a new message`, 'info');
+      lastMessageTimestamp = message.timestamp;  // Update the last message timestamp
     }
   });
 }
 
-// Show notification in the UI
+// Helper function to display a single message
+function displayMessage(message) {
+  const messageElement = document.createElement("div");
+  messageElement.classList.add("message-container");
+
+  const profilePicElement = document.createElement("img");
+  profilePicElement.src = message.profilePic;
+  profilePicElement.className = "profile-pic";
+  messageElement.appendChild(profilePicElement);
+  
+  // Display image if available
+  if (message.imageUrl) {
+    const imageElement = document.createElement("img");
+    imageElement.src = message.imageUrl;
+    imageElement.style.maxWidth = "300px";
+    messageElement.appendChild(imageElement);
+  }
+
+  // Display text message
+  if (message.text) {
+    const messageText = document.createElement("div");
+    messageText.classList.add("message-content");
+    messageText.textContent = `${message.username}: ${message.text}`;
+    messageElement.appendChild(messageText);
+  }
+
+  chatContainer.appendChild(messageElement);
+  chatContainer.scrollTop = chatContainer.scrollHeight; // Scroll to the bottom
+}
+
+// Show notification
 function showNotification(message, type) {
   const notification = document.createElement("div");
   notification.classList.add("notification", type);
