@@ -1,6 +1,6 @@
 // Import the necessary Firebase functions
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getDatabase, ref, push, set, onChildAdded } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+import { getDatabase, ref, push, set, onChildAdded, off } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
 // Firebase configuration
@@ -99,7 +99,7 @@ channelButtons.forEach(button => {
     currentChannel = button.getAttribute("data-channel");
     channelDiv.classList.add("hidden");
     chatDiv.classList.remove("hidden");
-    chatContainer.innerHTML = ""; // Clear messages
+    chatContainer.innerHTML = ""; // Clear messages before displaying new ones
     displayMessages();
     showNotification(`Joined ${currentChannel} channel.`, 'success');
   });
@@ -109,7 +109,7 @@ channelButtons.forEach(button => {
 backButton.addEventListener("click", () => {
   chatDiv.classList.add("hidden");
   channelDiv.classList.remove("hidden");
-  chatContainer.innerHTML = ""; // Clear messages
+  chatContainer.innerHTML = ""; // Clear messages before going back
 });
 
 // Send message (Text + Image)
@@ -139,7 +139,12 @@ sendButton.addEventListener("click", () => {
 // Display messages from Firebase
 function displayMessages() {
   if (!currentChannel) return;
+
   const messagesRef = ref(db, `channels/${currentChannel}/messages/`);
+  
+  // Remove previous event listener to avoid duplicates
+  off(messagesRef); 
+
   onChildAdded(messagesRef, (snapshot) => {
     const message = snapshot.val();
     const messageElement = document.createElement("div");
