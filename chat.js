@@ -51,6 +51,17 @@ let currentChannel = "";
 // Track the timestamp of the last message processed
 let lastMessageTimestamp = 0;
 
+// Request notification permission on page load
+document.addEventListener('DOMContentLoaded', () => {
+  if (Notification.permission !== 'granted') {
+    Notification.requestPermission().then(permission => {
+      if (permission !== 'granted') {
+        alert('Notification permission denied');
+      }
+    });
+  }
+});
+
 // Login functionality
 loginButton.addEventListener("click", () => {
   const token = loginTokenInput.value;
@@ -151,7 +162,9 @@ function displayMessages() {
     // If the message timestamp is newer than the last processed timestamp, display it
     if (message.timestamp > lastMessageTimestamp) {
       displayMessage(message);
-      showNotification(`${message.username} sent a new message`, 'info');
+      if (message.username !== currentUser) { // Only show notifications for other users' messages
+        showNotification(`${message.username} sent a new message`, 'info');
+      }
       lastMessageTimestamp = message.timestamp;  // Update the last message timestamp
     }
   });
@@ -189,12 +202,16 @@ function displayMessage(message) {
 
 // Show notification
 function showNotification(message, type) {
-  const notification = document.createElement("div");
-  notification.classList.add("notification", type);
-  notification.textContent = message;
-  notificationContainer.appendChild(notification);
+  if (Notification.permission === 'granted') {
+    new Notification(message, { body: message, icon: profilePicUrl });
+  } else {
+    const notification = document.createElement("div");
+    notification.classList.add("notification", type);
+    notification.textContent = message;
+    notificationContainer.appendChild(notification);
 
-  setTimeout(() => {
-    notification.remove();
-  }, 1000);
+    setTimeout(() => {
+      notification.remove();
+    }, 1000);
+  }
 }
