@@ -48,6 +48,19 @@ let currentUser = "";
 let profilePicUrl = "";
 let currentChannel = "";
 
+// Request permission for notifications
+function requestNotificationPermission() {
+  if (Notification.permission === "default") {
+    Notification.requestPermission().then(permission => {
+      if (permission === "granted") {
+        console.log("Notification permission granted.");
+      } else {
+        console.log("Notification permission denied.");
+      }
+    });
+  }
+}
+
 // Login functionality
 loginButton.addEventListener("click", () => {
   const token = loginTokenInput.value;
@@ -59,6 +72,7 @@ loginButton.addEventListener("click", () => {
         loginDiv.classList.add("hidden");
         channelDiv.classList.remove("hidden");
         showNotification(`${currentUser} logged in successfully!`, 'success');
+        requestNotificationPermission(); // Request permission for notifications
       })
       .catch((error) => {
         alert("Error: " + error.message);
@@ -154,10 +168,18 @@ function displayMessages() {
 
     chatContainer.appendChild(messageElement);
     chatContainer.scrollTop = chatContainer.scrollHeight; // Scroll to the bottom
+
+    // Show a system notification for the new message
+    if (Notification.permission === "granted") {
+      new Notification(`New message from ${message.username}`, {
+        body: message.text || "Message contains an image.",
+        icon: message.profilePic
+      });
+    }
   });
 }
 
-// Show notification
+// Show notification in the UI
 function showNotification(message, type) {
   const notification = document.createElement("div");
   notification.classList.add("notification", type);
